@@ -1610,25 +1610,11 @@ static void fwu_startup_fw_update_work(struct work_struct *work)
 		strcpy(fih_touch, fih_touch_fw);
 /*} FIH, Hubert, 20151006, the information of touch firmware version*/
 
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-		if(retval_reg < 0)
-		{
-			printk("BBox::UEC; 7::4\n");
-		}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
-
 exit:
 	kfree(fwu->ext_data_source);
 	fwu->ext_data_source = NULL;
 	fwu->force_update = FORCE_UPDATE;
 	fwu->do_lockdown = DO_LOCKDOWN;
-
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval < 0)
-	{
-		printk("BBox::UEC; 7::5\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
 
 	}
 	return;
@@ -1811,13 +1797,6 @@ static ssize_t fwu_sysfs_do_reflash_store(struct device *dev,
 	strcpy(fih_touch, fih_touch_fw);
 /*} FIH, Hubert, 20151006, the information of touch firmware version*/
 
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval_reg < 0)
-	{
-		printk("BBox::UEC; 7::4\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
-
 	retval = count;
 
 exit:
@@ -1825,13 +1804,6 @@ exit:
 	fwu->ext_data_source = NULL;
 	fwu->force_update = FORCE_UPDATE;
 	fwu->do_lockdown = DO_LOCKDOWN;
-
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval < 0)
-	{
-		printk("BBox::UEC; 7::5\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
 
 	return retval;
 }
@@ -1888,13 +1860,6 @@ static ssize_t fwu_sysfs_appupgrade_store(struct device *dev,
 	strcpy(fih_touch, fih_touch_fw);
 /*} FIH, Hubert, 20151006, the information of touch firmware version*/
 
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval_reg < 0)
-	{
-		printk("BBox::UEC; 7::4\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
-
 	retval = count;
 
 exit:
@@ -1905,13 +1870,6 @@ exit:
 	fwu->data_pos = 0;
 	fwu->image_size = 0;
 	mutex_unlock(&dsx_fwu_sysfs_mutex);
-
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval < 0)
-	{
-		printk("BBox::UEC; 7::5\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
 
 	return retval;
 }

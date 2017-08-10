@@ -4135,8 +4135,6 @@ if((fih_hwid_fetch(FIH_HWID_PRJ) == FIH_PRJ_NBQ)
                if (IS_ERR(regulator_wled))
                {
                        rc = PTR_ERR(regulator_wled);
-                       //FIH, Hubert, 20151021, BBox for touch, vibrator, led
-                       printk("BBox::UEC; 23::0\n");
                }
                else
                {
@@ -4144,8 +4142,6 @@ if((fih_hwid_fetch(FIH_HWID_PRJ) == FIH_PRJ_NBQ)
                        if (rc)
                        {
                                regulator_put(regulator_wled);
-                               //FIH, Hubert, 20151021, BBox for touch, vibrator, led
-                               printk("BBox::UEC; 23::0\n");
                        }
                }
        }

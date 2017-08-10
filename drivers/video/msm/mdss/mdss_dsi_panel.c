@@ -179,10 +179,6 @@ static ssize_t panel_print_status(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 		lx += snprintf(panel_reg_buf + lx, sizeof(panel_reg_buf),
 			 "%s%02x", "", rx_buf[i]);
 	}
-    if(strcmp(panel_reg_buf,"9c")!=0){
-	    printk("BBox;%s:lx =%d,panel_reg_buf= %s,data[%d]=%x\n",
-		    __func__, lx, panel_reg_buf, i, rx_buf[i]);
-    }
 	return 0;
 }
 
@@ -241,7 +237,6 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 {
 	struct dcs_cmd_req cmdreq;
 	struct mdss_panel_info *pinfo;
-    int ret = 0;
 	pinfo = &(ctrl->panel_data.panel_info);
 	if (pinfo->dcs_cmd_by_left) {
 		if (ctrl->ndx != DSI_CTRL_LEFT)
@@ -262,10 +257,6 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
-	ret = mdss_dsi_cmdlist_put(ctrl, &cmdreq);
-	if(ret < 0){
-	    printk("BBox::UEC;%d::%d\n", 0, 0);
-	}
 }
 
 static char led_pwm1[2] = {0x51, 0x0};	/* DTYPE_DCS_WRITE1 */
@@ -409,7 +400,6 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		rc = mdss_dsi_request_gpios(ctrl_pdata);
 		if (rc) {
 			pr_err("gpio request failed\n");
-			printk("BBox::UEC;%d::%d\n", 0, 1);
 			return rc;
 		}
 		if (!pinfo->cont_splash_enabled) {
@@ -2215,7 +2205,6 @@ int mdss_dsi_panel_init(struct device_node *node,
 						__func__, __LINE__);
 	} else {
 		pr_info("%s: Panel Name = %s\n", __func__, panel_name);
-		printk("BBox;%s: Panel Name = %s\n", __func__, panel_name);
 		strlcpy(&pinfo->panel_name[0], panel_name, MDSS_MAX_PANEL_LEN);
 	}
 	rc = mdss_panel_parse_dt(node, ctrl_pdata);

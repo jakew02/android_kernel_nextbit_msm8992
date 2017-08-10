@@ -60,9 +60,6 @@
 #define FPC_TTW_HOLD_TIME 1000
 #define NUM_PARAMS_REG_ENABLE_SET 2
 
-#define BBOX_FPC_PROB_FAIL do {printk("BBox::UEC;39::0\n");} while (0);
-#define BBOX_FPC_RESET_FAIL do {printk("BBox::UEC;39::1\n");} while (0);
-
 static const char * const pctl_names[] = {
 	"fpc1020_spi_active",
 	"fpc1020_reset_reset",
@@ -134,8 +131,6 @@ static int vreg_setup(struct fpc1020_data *fpc1020, const char *name,
 			goto found;
 	}
 	dev_err(dev, "Regulator %s not found\n", name);
-	printk("BBox;Regulator %s not found\n", name);
-	BBOX_FPC_RESET_FAIL;
 	return -EINVAL;
 found:
 	vreg = fpc1020->vreg[i];
@@ -144,8 +139,6 @@ found:
 			vreg = regulator_get(dev, name);
 			if (IS_ERR(vreg)) {
 				dev_err(dev, "Unable to get  %s\n", name);
-				printk("BBox;Unable to get  %s\n", name);
-				BBOX_FPC_RESET_FAIL;
 				return PTR_ERR(vreg);
 			}
 		}
@@ -164,8 +157,6 @@ found:
 		rc = regulator_enable(vreg);
 		if (rc) {
 			dev_err(dev, "error enabling %s: %d\n", name, rc);
-			printk("BBox;error enabling %s: %d\n", name, rc);
-			BBOX_FPC_RESET_FAIL;
 			regulator_put(vreg);
 			vreg = NULL;
 		}
@@ -200,8 +191,6 @@ static int spi_set_fabric(struct fpc1020_data *fpc1020, bool active)
 		master->unprepare_transfer_hardware(master);
 	if (rc) {
 		dev_err(fpc1020->dev, "%s: rc %d\n", __func__, rc);
-		printk("BBox;%s: rc %d\n", __func__, rc);
-		BBOX_FPC_RESET_FAIL;
 	} else
 		dev_dbg(fpc1020->dev, "%s: %d ok\n", __func__, active);
 	return rc;
@@ -244,9 +233,6 @@ static int set_pipe_ownership(struct fpc1020_data *fpc1020, bool to_tz)
 	if (rc || desc.ret[0]) {
 		dev_err(fpc1020->dev, "%s: scm_call2: responce %llu, rc %d\n",
 				__func__, desc.ret[0], rc);
-		printk("BBox;%s: scm_call2: responce %llu, rc %d\n",
-				__func__, desc.ret[0], rc);
-		BBOX_FPC_RESET_FAIL;
 		return -EINVAL;
 	}
 	dev_dbg(fpc1020->dev, "%s: scm_call2: ok\n", __func__);
@@ -278,11 +264,6 @@ static int set_clks(struct fpc1020_data *fpc1020, bool enable)
 					"%s: Error setting clk_rate: %u, %d\n",
 					__func__, fpc1020->spi->max_speed_hz,
 					rc);
-			printk(
-					"BBox;%s: Error setting clk_rate: %u, %d\n",
-					__func__, fpc1020->spi->max_speed_hz,
-					rc);
-			BBOX_FPC_RESET_FAIL;
 			goto out;
 		}
 		rc = clk_prepare_enable(fpc1020->core_clk);
@@ -290,10 +271,6 @@ static int set_clks(struct fpc1020_data *fpc1020, bool enable)
 			dev_err(fpc1020->dev,
 					"%s: Error enabling core clk: %d\n",
 					__func__, rc);
-			printk(
-					"BBox;%s: Error enabling core clk: %d\n",
-					__func__, rc);
-			BBOX_FPC_RESET_FAIL;
 			goto out;
 		}
 
@@ -302,10 +279,6 @@ static int set_clks(struct fpc1020_data *fpc1020, bool enable)
 			dev_err(fpc1020->dev,
 					"%s: Error enabling iface clk: %d\n",
 					__func__, rc);
-			printk(
-					"BBox;%s: Error enabling iface clk: %d\n",
-					__func__, rc);
-			BBOX_FPC_RESET_FAIL;
 			clk_disable_unprepare(fpc1020->core_clk);
 			goto out;
 		}
@@ -392,8 +365,6 @@ static int select_pin_ctl(struct fpc1020_data *fpc1020, const char *name)
 	}
 	rc = -EINVAL;
 	dev_err(dev, "%s:'%s' not found\n", __func__, name);
-	printk("BBox;%s:'%s' not found\n", __func__, name);
-	BBOX_FPC_RESET_FAIL;
 exit:
 	return rc;
 }
@@ -812,16 +783,12 @@ static int fpc1020_request_named_gpio(struct fpc1020_data *fpc1020,
 	int rc = of_get_named_gpio(np, label, 0);
 	if (rc < 0) {
 		dev_err(dev, "failed to get '%s'\n", label);
-		printk("BBox;failed to get '%s'\n", label);
-		BBOX_FPC_RESET_FAIL;
 		return rc;
 	}
 	*gpio = rc;
 	rc = devm_gpio_request(dev, *gpio, label);
 	if (rc) {
 		dev_err(dev, "failed to request gpio %d\n", *gpio);
-		printk("BBox;failed to request gpio %d\n", *gpio);
-		BBOX_FPC_RESET_FAIL;
 		return rc;
 	}
 	dev_dbg(dev, "%s %d\n", label, *gpio);
@@ -842,8 +809,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	if (!fpc1020) {
 		dev_err(dev,
 			"failed to allocate memory for struct fpc1020_data\n");
-		printk("BBox;failed to allocate memory for struct fpc1020_data\n");
-		BBOX_FPC_PROB_FAIL;
 		rc = -ENOMEM;
 		goto exit;
 	}
@@ -855,8 +820,6 @@ static int fpc1020_probe(struct spi_device *spi)
 
 	if (!np) {
 		dev_err(dev, "no of node found\n");
-		printk("BBox;no of node found\n");
-		BBOX_FPC_PROB_FAIL;
 		rc = -EINVAL;
 		goto exit;
 	}
@@ -877,8 +840,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	fpc1020->iface_clk = clk_get(dev, "iface_clk");
 	if (IS_ERR(fpc1020->iface_clk)) {
 		dev_err(dev, "%s: Failed to get iface_clk\n", __func__);
-		printk("BBox;%s: Failed to get iface_clk\n", __func__);
-		BBOX_FPC_PROB_FAIL;
 		rc = -EINVAL;
 		goto exit;
 	}
@@ -886,8 +847,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	fpc1020->core_clk = clk_get(dev, "core_clk");
 	if (IS_ERR(fpc1020->core_clk)) {
 		dev_err(dev, "%s: Failed to get core_clk\n", __func__);
-		printk("BBox;%s: Failed to get core_clk\n", __func__);
-		BBOX_FPC_PROB_FAIL;
 		rc = -EINVAL;
 		goto exit;
 	}
@@ -895,8 +854,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	rc = of_property_read_u32(np, "spi-qup-id", &val);
 	if (rc < 0) {
 		dev_err(dev, "spi-qup-id not found\n");
-		printk("BBox;spi-qup-id not found\n");
-		BBOX_FPC_PROB_FAIL;
 		goto exit;
 	}
 	fpc1020->qup_id = val;
@@ -906,14 +863,10 @@ static int fpc1020_probe(struct spi_device *spi)
 	if (IS_ERR(fpc1020->fingerprint_pinctrl)) {
 		if (PTR_ERR(fpc1020->fingerprint_pinctrl) == -EPROBE_DEFER) {
 			dev_info(dev, "pinctrl not ready\n");
-			printk("BBox;pinctrl not ready\n");
-			BBOX_FPC_PROB_FAIL;
 			rc = -EPROBE_DEFER;
 			goto exit;
 		}
 		dev_err(dev, "Target does not use pinctrl\n");
-		printk("BBox;Target does not use pinctrl\n");
-		BBOX_FPC_PROB_FAIL;
 		fpc1020->fingerprint_pinctrl = NULL;
 		rc = -EINVAL;
 		goto exit;
@@ -925,8 +878,6 @@ static int fpc1020_probe(struct spi_device *spi)
 			pinctrl_lookup_state(fpc1020->fingerprint_pinctrl, n);
 		if (IS_ERR(state)) {
 			dev_err(dev, "cannot find '%s'\n", n);
-			printk("BBox;cannot find '%s'\n", n);
-			BBOX_FPC_PROB_FAIL;
 			rc = -EINVAL;
 			goto exit;
 		}
@@ -971,9 +922,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	if (rc) {
 		dev_err(dev, "could not request irq %d\n",
 				gpio_to_irq(fpc1020->irq_gpio));
-		printk("BBox;could not request irq %d\n",
-				gpio_to_irq(fpc1020->irq_gpio));
-		BBOX_FPC_PROB_FAIL;
 		goto exit;
 	}
 	dev_dbg(dev, "requested irq %d\n", gpio_to_irq(fpc1020->irq_gpio));
@@ -988,8 +936,6 @@ static int fpc1020_probe(struct spi_device *spi)
 	rc = sysfs_create_group(&dev->kobj, &attribute_group);
 	if (rc) {
 		dev_err(dev, "could not create sysfs\n");
-		printk("BBox;could not create sysfs\n");
-		BBOX_FPC_PROB_FAIL;
 		goto exit;
 	}
 

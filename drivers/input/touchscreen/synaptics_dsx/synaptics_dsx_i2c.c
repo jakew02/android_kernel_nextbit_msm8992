@@ -181,13 +181,6 @@ static int synaptics_rmi4_i2c_read(struct synaptics_rmi4_data *rmi4_data,
 exit:
 	mutex_unlock(&rmi4_data->rmi4_io_ctrl_mutex);
 
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval < 0)
-	{
-		printk("BBox::UEC; 7::0\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
-
 	return retval;
 }
 
@@ -276,13 +269,6 @@ static int synaptics_rmi4_i2c_write(struct synaptics_rmi4_data *rmi4_data,
 
 exit:
 	mutex_unlock(&rmi4_data->rmi4_io_ctrl_mutex);
-
-/*FIH, Hubert, 20151021, BBox for touch, vibrator, led {*/
-	if(retval < 0)
-	{
-		printk("BBox::UEC; 7::1\n");
-	}
-/*} FIH, Hubert, 20151021, BBox for touch, vibrator, led*/
 
 	return retval;
 }
